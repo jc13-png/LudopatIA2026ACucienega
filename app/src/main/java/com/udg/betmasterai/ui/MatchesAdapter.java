@@ -40,22 +40,43 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchVie
         holder.tvDrawOdds.setText(String.valueOf(match.getDrawOdds()));
         holder.tvAwayOdds.setText(String.valueOf(match.getAwayOdds()));
 
-        // --- LÓGICA SIMULADA CON NUESTRO MOTOR (BetEngine) ---
-        // Asumiendo que las cuotas muy altas son riesgosas y las bajas son seguras (solo como base simulada)
-        // 1 / Cuota = probabilidad implicita simulada.
-        double probHome = 1.0 / match.getHomeOdds();
-        double ev = BetEngine.calculateExpectedValue(probHome, match.getHomeOdds());
-        double kelly = BetEngine.calculateKellyCriterion(probHome, match.getHomeOdds());
+        // ─── MOTOR DE IA (BetEngine) ────────────────────────────────────────────────
+        //
+        // CORRECCIÓN MATEMÁTICA: usamos la probabilidad estimada por la IA (aiProbabilityHome),
+        // que es DIFERENTE a la probabilidad implícita de la cuota (1/homeOdds).
+        //
+        // La IA la calcula tomando en cuenta:
+        //   1. Normalizar las probabilidades implícitas crudas (eliminar el margen de la casa)
+        //   2. Aplicar un factor de ventaja de local empírico (~18%)
+        //   3. Renormalizar para que el modelo sea autocontenido
+        //
+        // Esto asegura que EV = (P_ai * (cuota-1)) - ((1-P_ai) * 1) pueda ser > 0.
+        // ────────────────────────────────────────────────────────────────────────────
 
-        // Evaluar "Value Bet" (Si esperamos ganancia)
+        double aiProb       = match.getAiProbabilityHome();           // Estimación de la IA (real)
+        double impliedProb  = 1.0 / match.getHomeOdds();              // Probabilidad implícita de la casa
+        double ev           = BetEngine.calculateExpectedValue(aiProb, match.getHomeOdds());
+        double kelly        = BetEngine.calculateKellyCriterion(aiProb, match.getHomeOdds());
+
         if (ev > 0) {
             holder.cardIAIndicator.setCardBackgroundColor(Color.parseColor("#00C853")); // Verde
-            holder.tvIAStatus.setText("VALUE BET");
-            holder.tvIADetails.setText(String.format("La IA sugiere apostar %.1f%% de tu Bankroll al Local. (EV: +%.2f)", (kelly * 100), ev));
+            holder.tvIAStatus.setText("VALUE BET ✓");
+            holder.tvIADetails.setText(String.format(
+                    "IA: %.1f%% prob. | Casa: %.1f%% prob.\n" +
+                    "Apostar %.1f%% del Bankroll (Half Kelly). EV: +%.2f por $1 apostado.",
+                    aiProb * 100,
+                    impliedProb * 100,
+                    kelly * 100,
+                    ev));
         } else {
             holder.cardIAIndicator.setCardBackgroundColor(Color.parseColor("#D50000")); // Rojo
-            holder.tvIAStatus.setText("ALTO RIESGO");
-            holder.tvIADetails.setText("EV Negativo. Sugerencia de la IA: Mejor evitar apostar en este evento.");
+            holder.tvIAStatus.setText("ALTO RIESGO ✗");
+            holder.tvIADetails.setText(String.format(
+                    "IA: %.1f%% prob. | Casa: %.1f%% prob.\n" +
+                    "EV negativo (%.2f). La IA sugiere NO apostar en este evento.",
+                    aiProb * 100,
+                    impliedProb * 100,
+                    ev));
         }
     }
 

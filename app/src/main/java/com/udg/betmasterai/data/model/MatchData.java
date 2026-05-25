@@ -21,6 +21,13 @@ public class MatchData {
     @SerializedName("drawOdds")
     private double drawOdds;
 
+    /**
+     * Probabilidad estimada por el motor de IA (BetEngine / Poisson) para que gane el equipo local.
+     * Esta probabilidad es INDEPENDIENTE de la cuota de la casa de apuestas.
+     * Si aiProbability > (1 / homeOdds), existe una Value Bet (EV positivo).
+     */
+    private double aiProbabilityHome;
+
     // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -39,4 +46,16 @@ public class MatchData {
 
     public double getDrawOdds() { return drawOdds; }
     public void setDrawOdds(double drawOdds) { this.drawOdds = drawOdds; }
+
+    /**
+     * Devuelve la probabilidad estimada por la IA para la victoria local.
+     * Si no fue establecida explícitamente, devuelve la probabilidad implícita en la cuota
+     * como fallback (esto resultaría en EV=0, por lo que siempre debe establecerse).
+     */
+    public double getAiProbabilityHome() {
+        return aiProbabilityHome > 0 ? aiProbabilityHome : (1.0 / homeOdds);
+    }
+    public void setAiProbabilityHome(double aiProbabilityHome) {
+        this.aiProbabilityHome = aiProbabilityHome;
+    }
 }

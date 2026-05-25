@@ -1,6 +1,9 @@
 package com.udg.betmasterai.ui;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -10,69 +13,111 @@ import com.udg.betmasterai.data.local.AppDatabase;
 import com.udg.betmasterai.data.local.BetHistory;
 import com.udg.betmasterai.data.local.UserBalance;
 import com.udg.betmasterai.data.model.MatchData;
+import com.udg.betmasterai.data.remote.ApiConstants;
+import com.udg.betmasterai.data.repository.MatchRepository;
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MatchesViewModel extends AndroidViewModel {
-    
-    private MutableLiveData<List<MatchData>> matchesLiveData;
-    private AppDatabase database;
-    private LiveData<List<BetHistory>> allBets;
-    private LiveData<UserBalance> userBalance;
+
+    // ─── LiveData expuesto a la UI ────────────────────────────────────────────
+
+    private final MutableLiveData<List<MatchData>> matchesLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String>  statusMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isLoading     = new MutableLiveData<>(false);
+
+    // ─── Dependencias ─────────────────────────────────────────────────────────
+
+    private final AppDatabase     database;
+    private final MatchRepository repository;
+    private final LiveData<List<BetHistory>> allBets;
+    private final LiveData<UserBalance>      userBalance;
+
+    // ─── Auto-refresh ─────────────────────────────────────────────────────────
+
+    private final Handler        refreshHandler = new Handler(Looper.getMainLooper());
+    private static final int     REFRESH_MS     = ApiConstants.REFRESH_INTERVAL_SECONDS * 1000;
+
+    /**
+     * Runnable que se ejecuta en el hilo principal cada REFRESH_MS milisegundos.
+     * Llama a fetchMatches() y luego se re-registra a sí mismo para el siguiente ciclo.
+     */
+    private final Runnable refreshRunnable = new Runnable() {
+        @Override
+        public void run() {
+            fetchMatches();
+            refreshHandler.postDelayed(this, REFRESH_MS);
+        }
+    };
+
+    // ─── Constructor ─────────────────────────────────────────────────────────
 
     public MatchesViewModel(@NonNull Application application) {
         super(application);
-        database = AppDatabase.getDatabase(application);
-        allBets = database.betDao().getAllBets();
+
+        database    = AppDatabase.getDatabase(application);
+        repository  = new MatchRepository();
+        allBets     = database.betDao().getAllBets();
         userBalance = database.betDao().getUserBalance();
-        matchesLiveData = new MutableLiveData<>();
-        
-        // Simulación de datos (Mock)
-        List<MatchData> mockMatches = new ArrayList<>();
-        
-        // Partido 1 (Value Bet simulado)
-        MatchData m1 = new MatchData();
-        m1.setId(1);
-        m1.setHomeTeam("Real Madrid");
-        m1.setAwayTeam("Man City");
-        m1.setHomeOdds(2.10); // Prob implícita: 47%. Si el motor cree que la real es 60%, hay EV.
-        m1.setDrawOdds(3.40);
-        m1.setAwayOdds(3.20);
-        mockMatches.add(m1);
 
-        // Partido 2 (Alto Riesgo simulado)
-        MatchData m2 = new MatchData();
-        m2.setId(2);
-        m2.setHomeTeam("Arsenal");
-        m2.setAwayTeam("Bayern Munich");
-        m2.setHomeOdds(1.40); // Prob implícita: 71%. Difícil sacar EV de aquí.
-        m2.setDrawOdds(4.50);
-        m2.setAwayOdds(7.00);
-        mockMatches.add(m2);
+        // Primera carga inmediata al abrir la app
+        fetchMatches();
 
-        // Partido 3
-        MatchData m3 = new MatchData();
-        m3.setId(3);
-        m3.setHomeTeam("PSG");
-        m3.setAwayTeam("Barcelona");
-        m3.setHomeOdds(1.95);
-        m3.setDrawOdds(3.80);
-        m3.setAwayOdds(3.60);
-        mockMatches.add(m3);
-
-        matchesLiveData.setValue(mockMatches);
+        // Programar refresco automático cada REFRESH_INTERVAL_SECONDS segundos
+        refreshHandler.postDelayed(refreshRunnable, REFRESH_MS);
     }
 
-    public LiveData<List<MatchData>> getMatches() {
-        return matchesLiveData;
+    // ─── Carga de datos ───────────────────────────────────────────────────────
+
+    /**
+     * Solicita datos frescos al repositorio.
+     * Puede ser llamado manualmente (ej: SwipeRefreshLayout) o por el auto-refresh.
+     */
+    public void fetchMatches() {
+        isLoading.setValue(true);
+        statusMessage.setValue("Actualizando…");
+
+        repository.fetchMatches(ApiConstants.DEFAULT_SPORT, new MatchRepository.MatchesCallback() {
+
+            @Override
+            public void onSuccess(List<MatchData> matches, String source) {
+                matchesLiveData.postValue(matches);
+                isLoading.postValue(false);
+                statusMessage.postValue("✓ " + source + " · " + now());
+            }
+
+            @Override
+            public void onError(String errorMessage, List<MatchData> fallbackData) {
+                matchesLiveData.postValue(fallbackData);
+                isLoading.postValue(false);
+                statusMessage.postValue("⚠ " + errorMessage + "  (datos demo)");
+            }
+        });
     }
-    
-    public LiveData<List<BetHistory>> getAllBets() {
-        return allBets;
+
+    // ─── Limpieza al destruir el ViewModel ────────────────────────────────────
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        // Cancelar el auto-refresh para evitar memory leaks
+        refreshHandler.removeCallbacks(refreshRunnable);
     }
-    
-    public LiveData<UserBalance> getUserBalance() {
-        return userBalance;
+
+    // ─── Getters de LiveData ──────────────────────────────────────────────────
+
+    public LiveData<List<MatchData>>    getMatches()       { return matchesLiveData; }
+    public LiveData<String>             getStatusMessage() { return statusMessage; }
+    public LiveData<Boolean>            getIsLoading()     { return isLoading; }
+    public LiveData<List<BetHistory>>   getAllBets()        { return allBets; }
+    public LiveData<UserBalance>        getUserBalance()    { return userBalance; }
+
+    // ─── Helpers ──────────────────────────────────────────────────────────────
+
+    private String now() {
+        return new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
     }
 }
