@@ -95,7 +95,22 @@ public class MainActivity extends AppCompatActivity {
         // ─── Gráfico de Bankroll ──────────────────────────────────────────────
         setupBankrollChart();
 
-        viewModel.getAllBets().observe(this, this::updateBankrollChart);
+        viewModel.getAllBets().observe(this, bets -> {
+            updateBankrollChart(bets);
+            
+            // Calcular el bankroll actual para el adaptador
+            double currentBankroll = 1000.0;
+            if (bets != null) {
+                for (BetHistory bet : bets) {
+                    if ("WON".equalsIgnoreCase(bet.getResult())) {
+                        currentBankroll += bet.getActualBetAmount() * bet.getExpectedValue();
+                    } else if ("LOST".equalsIgnoreCase(bet.getResult())) {
+                        currentBankroll -= bet.getActualBetAmount();
+                    }
+                }
+            }
+            adapter.setCurrentBankroll(currentBankroll);
+        });
     }
 
     // ─────────────────────────────────────────────────────────────────────────

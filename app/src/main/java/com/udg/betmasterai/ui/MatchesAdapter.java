@@ -1,5 +1,6 @@
 package com.udg.betmasterai.ui;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.udg.betmasterai.R;
 import com.udg.betmasterai.data.model.MatchData;
@@ -17,6 +19,12 @@ import java.util.List;
 public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchViewHolder> {
 
     private List<MatchData> matchesList = new ArrayList<>();
+    private double currentBankroll = 1000.0; // Default inicial
+
+    public void setCurrentBankroll(double bankroll) {
+        this.currentBankroll = bankroll;
+        notifyDataSetChanged();
+    }
 
     public void setMatches(List<MatchData> matches) {
         this.matchesList = matches;
@@ -78,6 +86,16 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchVie
                     impliedProb * 100,
                     ev));
         }
+
+        // Configurar botón Apostar
+        holder.btnBet.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), BetActivity.class);
+            intent.putExtra("match_details", match.getHomeTeam() + " vs " + match.getAwayTeam());
+            intent.putExtra("expected_value", ev);
+            intent.putExtra("suggested_bet", kelly * currentBankroll);
+            intent.putExtra("home_odds", match.getHomeOdds());
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override
@@ -88,6 +106,7 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchVie
     static class MatchViewHolder extends RecyclerView.ViewHolder {
         TextView tvTeams, tvHomeOdds, tvDrawOdds, tvAwayOdds, tvIAStatus, tvIADetails;
         MaterialCardView cardIAIndicator;
+        MaterialButton btnBet;
 
         public MatchViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -98,6 +117,7 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchVie
             tvIAStatus = itemView.findViewById(R.id.tvIAStatus);
             tvIADetails = itemView.findViewById(R.id.tvIADetails);
             cardIAIndicator = itemView.findViewById(R.id.cardIAIndicator);
+            btnBet = itemView.findViewById(R.id.btnBet);
         }
     }
 }
