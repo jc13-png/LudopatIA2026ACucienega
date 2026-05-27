@@ -24,4 +24,7 @@ public interface BetDao {
 
     @Update
     void updateBalance(UserBalance balance);
+
+    @Query("UPDATE bet_history SET result = :result WHERE id = :id")
+    void updateBetResult(int id, String result);
 }

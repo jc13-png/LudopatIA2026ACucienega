@@ -72,15 +72,24 @@ public class MatchesViewModel extends AndroidViewModel {
 
     // ─── Carga de datos ───────────────────────────────────────────────────────
 
+    private String currentSport = ApiConstants.DEFAULT_SPORT;
+
     /**
-     * Solicita datos frescos al repositorio.
-     * Puede ser llamado manualmente (ej: SwipeRefreshLayout) o por el auto-refresh.
+     * Solicita datos frescos al repositorio para el deporte seleccionado por defecto.
      */
     public void fetchMatches() {
+        fetchMatchesBySport(currentSport);
+    }
+
+    /**
+     * Solicita datos frescos al repositorio para una liga/deporte específico.
+     */
+    public void fetchMatchesBySport(String sport) {
+        this.currentSport = sport;
         isLoading.setValue(true);
         statusMessage.setValue("Actualizando…");
 
-        repository.fetchMatches(ApiConstants.DEFAULT_SPORT, new MatchRepository.MatchesCallback() {
+        repository.fetchMatches(sport, new MatchRepository.MatchesCallback() {
 
             @Override
             public void onSuccess(List<MatchData> matches, String source) {

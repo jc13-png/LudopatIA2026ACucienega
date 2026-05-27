@@ -1,9 +1,13 @@
 package com.udg.betmasterai.ui;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,6 +51,59 @@ public class MainActivity extends AppCompatActivity {
         progressBar        = findViewById(R.id.progressBar);
         tvStatus           = findViewById(R.id.tvStatus);
         bankrollChart      = findViewById(R.id.bankrollChart);
+
+        findViewById(R.id.btnHistory).setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, HistoryActivity.class));
+        });
+
+        // ─── Selector de Liga (Spinner) ──────────────────────────────────────
+        Spinner spinnerLeague = findViewById(R.id.spinnerLeague);
+        String[] leagueNames = {
+                "La Liga (España)",
+                "Liga MX (México)",
+                "Premier League (Inglaterra)",
+                "Champions League (UEFA)",
+                "Bundesliga (Alemania)",
+                "Serie A (Italia)",
+                "Ligue 1 (Francia)"
+        };
+        String[] leagueKeys = {
+                "soccer_spain_la_liga",
+                "soccer_mexico_ligamx",
+                "soccer_epl",
+                "soccer_uefa_champs_league",
+                "soccer_germany_bundesliga",
+                "soccer_italy_serie_a",
+                "soccer_france_ligue_one"
+        };
+
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                leagueNames
+        );
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerLeague.setAdapter(spinnerAdapter);
+
+        // Pre-seleccionar la liga por defecto (La Liga)
+        spinnerLeague.setSelection(0);
+
+        spinnerLeague.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Cambiar el color del texto del spinner seleccionado para que sea legible en tema oscuro
+                if (parent.getChildAt(0) != null) {
+                    ((TextView) parent.getChildAt(0)).setTextColor(Color.WHITE);
+                    ((TextView) parent.getChildAt(0)).setTextSize(14);
+                }
+                viewModel.fetchMatchesBySport(leagueKeys[position]);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // No hacer nada
+            }
+        });
 
         // ─── RecyclerView de Partidos ──────────────────────────────────────────
         RecyclerView rvMatches = findViewById(R.id.rvMatches);
@@ -103,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
             if (bets != null) {
                 for (BetHistory bet : bets) {
                     if ("WON".equalsIgnoreCase(bet.getResult())) {
-                        currentBankroll += bet.getActualBetAmount() * bet.getExpectedValue();
+                        currentBankroll += bet.getActualBetAmount() * (bet.getOdds() - 1);
                     } else if ("LOST".equalsIgnoreCase(bet.getResult())) {
                         currentBankroll -= bet.getActualBetAmount();
                     }
@@ -182,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < ordered.size(); i++) {
             BetHistory bet = ordered.get(i);
             if ("WON".equalsIgnoreCase(bet.getResult())) {
-                balance += bet.getActualBetAmount() * (bet.getExpectedValue());
+                balance += bet.getActualBetAmount() * (bet.getOdds() - 1);
             } else if ("LOST".equalsIgnoreCase(bet.getResult())) {
                 balance -= bet.getActualBetAmount();
             }

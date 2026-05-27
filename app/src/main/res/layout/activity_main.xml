@@ -10,12 +10,12 @@
     android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212">
+    android:background="@color/dark_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#121212"
+        android:background="@color/dark_background"
         tools:context=".ui.MainActivity">
 
         <!-- ═══════════════════════════════════════════════════════ HEADER -->
@@ -24,8 +24,8 @@
             android:id="@+id/tvHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="BetMaster AI"
-            android:textColor="#FFFFFF"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -35,6 +35,21 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintHorizontal_bias="0.5" />
 
+        <!-- Botón para ver Historial -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnHistory"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="@string/history"
+            android:textColor="@color/purple_accent"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/tvHeader"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvHeader" />
+
         <!-- Spinner de carga (visible solo mientras se actualiza) -->
         <ProgressBar
             android:id="@+id/progressBar"
@@ -42,12 +57,11 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="10dp"
-            android:indeterminateTint="#BB86FC"
+            android:indeterminateTint="@color/purple_accent"
             android:visibility="gone"
             app:layout_constraintStart_toEndOf="@+id/tvHeader"
             app:layout_constraintTop_toTopOf="@+id/tvHeader"
             app:layout_constraintBottom_toBottomOf="@+id/tvHeader"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0" />
 
         <!-- ══════════════════════════════════════════════ BARRA DE ESTADO -->
@@ -65,7 +79,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginHorizontal="16dp"
             android:gravity="center"
-            android:textColor="#888888"
+            android:textColor="@color/text_secondary"
             android:textSize="11sp"
             android:singleLine="true"
             android:ellipsize="end"
@@ -73,6 +87,31 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvHeader" />
+
+        <!-- ════════════════════════════════════════ SELECCIONADOR DE LIGA -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardLeagueSelector"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="16dp"
+            app:cardBackgroundColor="@color/card_background"
+            app:cardCornerRadius="8dp"
+            app:strokeColor="@color/divider_stroke"
+            app:strokeWidth="1dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvStatus">
+
+            <Spinner
+                android:id="@+id/spinnerLeague"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:paddingHorizontal="12dp"
+                android:backgroundTint="@color/white"
+                android:spinnerMode="dropdown" />
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- ════════════════════════════════════════ GRÁFICO DE BANKROLL -->
 
@@ -82,13 +121,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
             android:layout_marginStart="16dp"
-            android:text="Evolución del Bankroll"
-            android:textColor="#BB86FC"
+            android:text="@string/bankroll_evolution"
+            android:textColor="@color/purple_accent"
             android:textSize="14sp"
             android:textStyle="bold"
             android:letterSpacing="0.08"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvStatus" />
+            app:layout_constraintTop_toBottomOf="@id/cardLeagueSelector" />
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/bankrollChart"
@@ -108,8 +147,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginStart="16dp"
-            android:text="Partidos de Hoy"
-            android:textColor="#BB86FC"
+            android:text="@string/today_matches"
+            android:textColor="@color/purple_accent"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"

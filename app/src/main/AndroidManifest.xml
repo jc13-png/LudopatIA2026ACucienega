@@ -30,6 +30,12 @@
             android:exported="false"
             android:label="Registrar Apuesta"
             android:theme="@style/Theme.BetMasterAI" />
+
+        <activity
+            android:name=".ui.HistoryActivity"
+            android:exported="false"
+            android:label="Historial de Apuestas"
+            android:theme="@style/Theme.BetMasterAI" />
     </application>
 
 </manifest>

@@ -152,6 +152,7 @@ public class BetActivity extends AppCompatActivity {
             apuesta.setActualBetAmount(montoReal);
             apuesta.setResult(resultado);
             apuesta.setTimestamp(System.currentTimeMillis());
+            apuesta.setOdds(homeOdds);
 
             // Insertar en la base de datos en un hilo background
             // (Room no permite operaciones de BD en el hilo principal)

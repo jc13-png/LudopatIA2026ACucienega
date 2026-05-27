@@ -15,7 +15,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
+    android:background="@color/dark_background"
     android:fillViewport="true">
 
     <LinearLayout
@@ -32,8 +32,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
-            android:text="Registrar Apuesta"
-            android:textColor="#FFFFFF"
+            android:text="@string/bet_title"
+            android:textColor="@color/white"
             android:textSize="24sp"
             android:textStyle="bold" />
 
@@ -44,8 +44,8 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="20dp"
-            android:text="Completa los datos y guarda tu apuesta"
-            android:textColor="#888888"
+            android:text="@string/bet_subtitle"
+            android:textColor="@color/text_secondary"
             android:textSize="13sp" />
 
         <!-- ══════════════════════════════════════════════ CARD DEL PARTIDO -->

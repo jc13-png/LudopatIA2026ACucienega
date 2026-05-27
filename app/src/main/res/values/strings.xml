@@ -1,3 +1,32 @@
 <resources>
-    <string name="app_name">BetMaster AI.</string>
+    <string name="app_name">BetMaster AI</string>
+    <string name="bankroll_evolution">Evolución del Bankroll</string>
+    <string name="today_matches">Partidos de Hoy</string>
+    <string name="history">Historial</string>
+    
+    <!-- Historial Screen -->
+    <string name="bet_history">Historial de Apuestas</string>
+    <string name="empty_history">No hay apuestas registradas aún.</string>
+    <string name="amount_label">Monto</string>
+    <string name="odds_label">Cuota (Odds)</string>
+    <string name="ev_label">Valor (EV)</string>
+    <string name="action_lost">Perdida</string>
+    <string name="action_won">Ganada</string>
+    
+    <!-- Bet Details / Registration Screen -->
+    <string name="local_label">1 (Local)</string>
+    <string name="draw_label">X (Empate)</string>
+    <string name="away_label">2 (Visita)</string>
+    <string name="bet_title">Registrar Apuesta</string>
+    <string name="save_button">Guardar</string>
+    <string name="cancel_button">Cancelar</string>
+    <string name="win_probability_label">Probabilidad de victoria:</string>
+    <string name="suggested_bet_label">Sugerido (Half Kelly):</string>
+    <string name="actual_bet_label">Monto a apostar ($):</string>
+    <string name="bet_result_label">Resultado del partido:</string>
+    <string name="status_pending_label">Pendiente</string>
+    <string name="available_odds">CUOTAS DISPONIBLES</string>
+    <string name="value_bet_label">VALUE BET</string>
+    <string name="bet_action">Apostar</string>
+    <string name="bet_subtitle">Completa los datos y guarda tu apuesta</string>
 </resources>

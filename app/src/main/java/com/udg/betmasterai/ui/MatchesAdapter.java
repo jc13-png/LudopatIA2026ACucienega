@@ -3,6 +3,7 @@ package com.udg.betmasterai.ui;
 import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.view.animation.AnimationUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -67,7 +68,7 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchVie
         double kelly        = BetEngine.calculateKellyCriterion(aiProb, match.getHomeOdds());
 
         if (ev > 0) {
-            holder.cardIAIndicator.setCardBackgroundColor(Color.parseColor("#00C853")); // Verde
+            holder.cardIAIndicator.setCardBackgroundColor(androidx.core.content.ContextCompat.getColor(holder.itemView.getContext(), R.color.status_won));
             holder.tvIAStatus.setText("VALUE BET ✓");
             holder.tvIADetails.setText(String.format(
                     "IA: %.1f%% prob. | Casa: %.1f%% prob.\n" +
@@ -77,7 +78,7 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchVie
                     kelly * 100,
                     ev));
         } else {
-            holder.cardIAIndicator.setCardBackgroundColor(Color.parseColor("#D50000")); // Rojo
+            holder.cardIAIndicator.setCardBackgroundColor(androidx.core.content.ContextCompat.getColor(holder.itemView.getContext(), R.color.status_lost));
             holder.tvIAStatus.setText("ALTO RIESGO ✗");
             holder.tvIADetails.setText(String.format(
                     "IA: %.1f%% prob. | Casa: %.1f%% prob.\n" +
@@ -96,6 +97,9 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchVie
             intent.putExtra("home_odds", match.getHomeOdds());
             v.getContext().startActivity(intent);
         });
+
+        // Animación de entrada para el item
+        holder.itemView.startAnimation(AnimationUtils.loadAnimation(holder.itemView.getContext(), R.anim.fade_in));
     }
 
     @Override
