@@ -105,7 +105,6 @@ public class MatchRepository {
      */
     private List<MatchData> mapApiResponseToMatchData(List<OddsApiMatch> apiMatches) {
         List<MatchData> result = new ArrayList<>();
-        int id = 1;
 
         for (OddsApiMatch apiMatch : apiMatches) {
             if (apiMatch.getBookmakers() == null || apiMatch.getBookmakers().isEmpty()) continue;
@@ -150,7 +149,7 @@ public class MatchRepository {
             double drawOdds = Math.round((drawOddsSum / count) * 100.0) / 100.0;
 
             MatchData match = new MatchData();
-            match.setId(id++);
+            match.setId(apiMatch.getId());
             match.setHomeTeam(apiMatch.getHomeTeam());
             match.setAwayTeam(apiMatch.getAwayTeam());
             match.setHomeOdds(homeOdds);
@@ -174,7 +173,7 @@ public class MatchRepository {
 
         // Partido 1: Real Madrid vs Man City
         MatchData m1 = new MatchData();
-        m1.setId(1);
+        m1.setId("mock_1");
         m1.setHomeTeam("Real Madrid");
         m1.setAwayTeam("Man City");
         m1.setHomeOdds(2.10);
@@ -185,7 +184,7 @@ public class MatchRepository {
 
         // Partido 2: Arsenal vs Bayern Munich
         MatchData m2 = new MatchData();
-        m2.setId(2);
+        m2.setId("mock_2");
         m2.setHomeTeam("Arsenal");
         m2.setAwayTeam("Bayern Munich");
         m2.setHomeOdds(1.40);
@@ -196,7 +195,7 @@ public class MatchRepository {
 
         // Partido 3: PSG vs Barcelona
         MatchData m3 = new MatchData();
-        m3.setId(3);
+        m3.setId("mock_3");
         m3.setHomeTeam("PSG");
         m3.setAwayTeam("Barcelona");
         m3.setHomeOdds(1.95);

@@ -14,11 +14,14 @@ import com.udg.betmasterai.R;
 import com.udg.betmasterai.data.model.MatchData;
 import com.udg.betmasterai.domain.BetEngine;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchViewHolder> {
 
     private List<MatchData> matchesList = new ArrayList<>();
+    private Set<String> bettedMatches = new HashSet<>();
     private double currentBankroll = 1000.0; // Default inicial
 
     public void setCurrentBankroll(double bankroll) {
@@ -28,6 +31,11 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchVie
 
     public void setMatches(List<MatchData> matches) {
         this.matchesList = matches;
+        notifyDataSetChanged();
+    }
+
+    public void setBettedMatches(Set<String> bettedMatches) {
+        this.bettedMatches = bettedMatches;
         notifyDataSetChanged();
     }
 
@@ -87,15 +95,30 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchVie
                     ev));
         }
 
-        // Configurar botón Apostar
-        holder.btnBet.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), BetActivity.class);
-            intent.putExtra("match_details", match.getHomeTeam() + " vs " + match.getAwayTeam());
-            intent.putExtra("expected_value", ev);
-            intent.putExtra("suggested_bet", kelly * currentBankroll);
-            intent.putExtra("home_odds", match.getHomeOdds());
-            v.getContext().startActivity(intent);
-        });
+        // ─── LÓGICA DEL BOTÓN DE APUESTA ────────────────────────────────────────
+
+        if (bettedMatches.contains(match.getId())) {
+            holder.btnBet.setText("Ya Apostaste ✓");
+            holder.btnBet.setEnabled(false);
+            holder.btnBet.setBackgroundColor(Color.parseColor("#333333")); // Gris/Apagado
+            holder.btnBet.setTextColor(Color.parseColor("#888888"));
+        } else {
+            holder.btnBet.setText("Apostar");
+            holder.btnBet.setEnabled(true);
+            holder.btnBet.setBackgroundColor(Color.parseColor("#BB86FC")); // Color original Material
+            holder.btnBet.setTextColor(Color.WHITE);
+            
+            // Configurar botón Apostar
+            holder.btnBet.setOnClickListener(v -> {
+                Intent intent = new Intent(v.getContext(), BetActivity.class);
+                intent.putExtra("match_id", match.getId());
+                intent.putExtra("match_details", match.getHomeTeam() + " vs " + match.getAwayTeam());
+                intent.putExtra("expected_value", ev);
+                intent.putExtra("suggested_bet", kelly * currentBankroll);
+                intent.putExtra("home_odds", match.getHomeOdds());
+                v.getContext().startActivity(intent);
+            });
+        }
     }
 
     @Override

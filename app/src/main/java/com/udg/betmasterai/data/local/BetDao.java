@@ -13,6 +13,9 @@ public interface BetDao {
     @Insert
     void insertBet(BetHistory bet);
 
+    @Query("UPDATE bet_history SET result = :result WHERE id = :id")
+    void updateBetResult(int id, String result);
+
     @Query("SELECT * FROM bet_history ORDER BY timestamp DESC")
     LiveData<List<BetHistory>> getAllBets();
 

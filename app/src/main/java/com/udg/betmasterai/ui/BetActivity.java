@@ -19,6 +19,7 @@ import java.text.DecimalFormat;
  * Pantalla para registrar una apuesta manualmente.
  *
  * Recibe via Intent los datos del partido seleccionado:
+ *   - "match_id"       → String  ID de la API
  *   - "match_details"  → String  nombre del partido
  *   - "expected_value" → double  EV calculado por BetEngine
  *   - "suggested_bet"  → double  monto sugerido por Half Kelly
@@ -35,12 +36,13 @@ public class BetActivity extends AppCompatActivity {
     private TextView         tvOdds;
     private TextView         tvSuggestedBet;
     private TextInputEditText etActualBet;
-    private RadioGroup       rgResult;
+    private RadioGroup       rgForecast;
     private MaterialButton   btnSaveBet;
     private MaterialButton   btnCancel;
 
     // ─── Datos recibidos del partido ─────────────────────────────────────────
 
+    private String matchId;
     private String matchDetails;
     private double expectedValue;
     private double suggestedBet;
@@ -74,6 +76,7 @@ public class BetActivity extends AppCompatActivity {
 
     private void leerDatosDelIntent() {
         Intent intent = getIntent();
+        matchId       = intent.getStringExtra("match_id");
         matchDetails  = intent.getStringExtra("match_details");
         expectedValue = intent.getDoubleExtra("expected_value", 0.0);
         suggestedBet  = intent.getDoubleExtra("suggested_bet", 0.0);
@@ -88,7 +91,7 @@ public class BetActivity extends AppCompatActivity {
         tvOdds          = findViewById(com.udg.betmasterai.R.id.tvOdds);
         tvSuggestedBet  = findViewById(com.udg.betmasterai.R.id.tvSuggestedBet);
         etActualBet     = findViewById(com.udg.betmasterai.R.id.etActualBet);
-        rgResult        = findViewById(com.udg.betmasterai.R.id.rgResult);
+        rgForecast      = findViewById(com.udg.betmasterai.R.id.rgForecast);
         btnSaveBet      = findViewById(com.udg.betmasterai.R.id.btnSaveBet);
         btnCancel       = findViewById(com.udg.betmasterai.R.id.btnCancel);
     }
@@ -141,16 +144,18 @@ public class BetActivity extends AppCompatActivity {
                 return;
             }
 
-            // Leer el resultado seleccionado en los RadioButtons
-            String resultado = obtenerResultadoSeleccionado();
+            // Leer el equipo seleccionado
+            String pronostico = obtenerPronosticoSeleccionado();
 
             // Construir el objeto BetHistory para guardar en Room
             BetHistory apuesta = new BetHistory();
+            apuesta.setMatchId(matchId);
             apuesta.setMatchDetails(matchDetails);
+            apuesta.setSelectedTeam(pronostico);
             apuesta.setExpectedValue(expectedValue);
             apuesta.setSuggestedBet(suggestedBet);
             apuesta.setActualBetAmount(montoReal);
-            apuesta.setResult(resultado);
+            apuesta.setResult("PENDING"); // SIEMPRE pendiente inicialmente
             apuesta.setTimestamp(System.currentTimeMillis());
 
             // Insertar en la base de datos en un hilo background
@@ -172,17 +177,17 @@ public class BetActivity extends AppCompatActivity {
         btnCancel.setOnClickListener(v -> finish());
     }
 
-    // ─── Helper: leer el RadioButton seleccionado ────────────────────────────
+    // ─── Helper: leer el pronóstico seleccionado ────────────────────────────
 
-    private String obtenerResultadoSeleccionado() {
-        int seleccionId = rgResult.getCheckedRadioButtonId();
+    private String obtenerPronosticoSeleccionado() {
+        int seleccionId = rgForecast.getCheckedRadioButtonId();
 
-        if (seleccionId == com.udg.betmasterai.R.id.rbWon) {
-            return "WON";
-        } else if (seleccionId == com.udg.betmasterai.R.id.rbLost) {
-            return "LOST";
+        if (seleccionId == com.udg.betmasterai.R.id.rbHome) {
+            return "Local";
+        } else if (seleccionId == com.udg.betmasterai.R.id.rbDraw) {
+            return "Empate";
         } else {
-            return "PENDING"; // rbPending (opción por defecto)
+            return "Visita";
         }
     }
 }

@@ -16,6 +16,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#121212"
+    android:fitsSystemWindows="true"
     android:fillViewport="true">
 
     <LinearLayout
@@ -265,56 +266,56 @@
                         tools:text="50.00" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Etiqueta: Seleccionar resultado -->
+                <!-- Etiqueta: Seleccionar Pronóstico -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:text="Estado inicial de la apuesta"
+                    android:text="¿A quién le apuestas?"
                     android:textColor="#888888"
                     android:textSize="13sp" />
 
-                <!-- RadioGroup para el resultado -->
+                <!-- RadioGroup para el pronóstico -->
                 <RadioGroup
-                    android:id="@+id/rgResult"
+                    android:id="@+id/rgForecast"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginBottom="8dp">
 
-                    <!-- PENDING -->
+                    <!-- Local -->
                     <RadioButton
-                        android:id="@+id/rbPending"
+                        android:id="@+id/rbHome"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:checked="true"
-                        android:text="Pendiente"
+                        android:text="Local"
                         android:textColor="#FFFFFF"
                         android:textSize="13sp"
                         android:buttonTint="#BB86FC" />
 
-                    <!-- WON -->
+                    <!-- Empate -->
                     <RadioButton
-                        android:id="@+id/rbWon"
+                        android:id="@+id/rbDraw"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Ganada ✓"
+                        android:text="Empate"
                         android:textColor="#FFFFFF"
                         android:textSize="13sp"
-                        android:buttonTint="#00C853" />
+                        android:buttonTint="#03DAC5" />
 
-                    <!-- LOST -->
+                    <!-- Visita -->
                     <RadioButton
-                        android:id="@+id/rbLost"
+                        android:id="@+id/rbAway"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Perdida ✗"
+                        android:text="Visita"
                         android:textColor="#FFFFFF"
                         android:textSize="13sp"
-                        android:buttonTint="#D50000" />
+                        android:buttonTint="#FFB300" />
 
                 </RadioGroup>
 
