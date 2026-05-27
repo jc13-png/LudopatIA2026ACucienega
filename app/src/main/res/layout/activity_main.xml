@@ -10,6 +10,7 @@
     android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="@color/dark_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,21 +36,6 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintHorizontal_bias="0.5" />
 
-        <!-- Botón para ver Historial -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnHistory"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:text="@string/history"
-            android:textColor="@color/purple_accent"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/tvHeader"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tvHeader" />
-
         <!-- Spinner de carga (visible solo mientras se actualiza) -->
         <ProgressBar
             android:id="@+id/progressBar"
@@ -57,12 +43,28 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:indeterminateTint="@color/purple_accent"
             android:visibility="gone"
             app:layout_constraintStart_toEndOf="@+id/tvHeader"
             app:layout_constraintTop_toTopOf="@+id/tvHeader"
             app:layout_constraintBottom_toBottomOf="@+id/tvHeader"
             app:layout_constraintHorizontal_bias="0" />
+
+        <!-- Botón Historial -->
+        <ImageView
+            android:id="@+id/btnHistory"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@android:drawable/ic_menu_recent_history"
+            app:tint="@color/teal_accent"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- ══════════════════════════════════════════════ BARRA DE ESTADO -->
 

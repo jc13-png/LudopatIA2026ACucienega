@@ -1,6 +1,7 @@
 package com.udg.betmasterai.data.remote;
 
 import com.udg.betmasterai.data.model.OddsApiMatch;
+import com.udg.betmasterai.data.model.OddsApiScore;
 
 import java.util.List;
 
@@ -30,5 +31,15 @@ public interface SportsApi {
             @Query("regions")    String regions,
             @Query("markets")    String markets,
             @Query("oddsFormat") String oddsFormat
+    );
+
+    /**
+     * Obtiene los resultados de los partidos (scores).
+     */
+    @GET("v4/sports/{sport}/scores")
+    Call<List<OddsApiScore>> getScores(
+            @Path("sport")       String sport,
+            @Query("apiKey")     String apiKey,
+            @Query("daysFrom")   int daysFrom
     );
 }

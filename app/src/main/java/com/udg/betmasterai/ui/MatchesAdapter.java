@@ -15,11 +15,14 @@ import com.udg.betmasterai.R;
 import com.udg.betmasterai.data.model.MatchData;
 import com.udg.betmasterai.domain.BetEngine;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchViewHolder> {
 
     private List<MatchData> matchesList = new ArrayList<>();
+    private Set<String> bettedMatches = new HashSet<>();
     private double currentBankroll = 1000.0; // Default inicial
 
     public void setCurrentBankroll(double bankroll) {
@@ -29,6 +32,11 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchVie
 
     public void setMatches(List<MatchData> matches) {
         this.matchesList = matches;
+        notifyDataSetChanged();
+    }
+
+    public void setBettedMatches(Set<String> bettedMatches) {
+        this.bettedMatches = bettedMatches;
         notifyDataSetChanged();
     }
 
@@ -88,15 +96,29 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.MatchVie
                     ev));
         }
 
-        // Configurar botón Apostar
-        holder.btnBet.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), BetActivity.class);
-            intent.putExtra("match_details", match.getHomeTeam() + " vs " + match.getAwayTeam());
-            intent.putExtra("expected_value", ev);
-            intent.putExtra("suggested_bet", kelly * currentBankroll);
-            intent.putExtra("home_odds", match.getHomeOdds());
-            v.getContext().startActivity(intent);
-        });
+        // ─── LÓGICA DEL BOTÓN DE APUESTA ────────────────────────────────────────
+
+        if (bettedMatches.contains(match.getId())) {
+            holder.btnBet.setText("Ya Apostaste ✓");
+            holder.btnBet.setEnabled(false);
+            holder.btnBet.setBackgroundColor(androidx.core.content.ContextCompat.getColor(holder.itemView.getContext(), R.color.divider_stroke));
+            holder.btnBet.setTextColor(androidx.core.content.ContextCompat.getColor(holder.itemView.getContext(), R.color.text_secondary));
+        } else {
+            holder.btnBet.setText(R.string.bet_action);
+            holder.btnBet.setEnabled(true);
+            holder.btnBet.setBackgroundColor(androidx.core.content.ContextCompat.getColor(holder.itemView.getContext(), R.color.teal_accent));
+            holder.btnBet.setTextColor(androidx.core.content.ContextCompat.getColor(holder.itemView.getContext(), R.color.dark_background));
+            
+            holder.btnBet.setOnClickListener(v -> {
+                Intent intent = new Intent(v.getContext(), BetActivity.class);
+                intent.putExtra("match_id", match.getId());
+                intent.putExtra("match_details", match.getHomeTeam() + " vs " + match.getAwayTeam());
+                intent.putExtra("expected_value", ev);
+                intent.putExtra("suggested_bet", kelly * currentBankroll);
+                intent.putExtra("home_odds", match.getHomeOdds());
+                v.getContext().startActivity(intent);
+            });
+        }
 
         // Animación de entrada para el item
         holder.itemView.startAnimation(AnimationUtils.loadAnimation(holder.itemView.getContext(), R.anim.fade_in));

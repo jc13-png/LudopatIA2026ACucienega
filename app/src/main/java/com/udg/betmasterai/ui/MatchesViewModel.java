@@ -96,6 +96,8 @@ public class MatchesViewModel extends AndroidViewModel {
                 matchesLiveData.postValue(matches);
                 isLoading.postValue(false);
                 statusMessage.postValue("✓ " + source + " · " + now());
+                
+                fetchScoresAndResolveBets();
             }
 
             @Override
@@ -125,6 +127,74 @@ public class MatchesViewModel extends AndroidViewModel {
     public LiveData<UserBalance>        getUserBalance()    { return userBalance; }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
+
+    private void fetchScoresAndResolveBets() {
+        List<BetHistory> bets = allBets.getValue();
+        if (bets == null || bets.isEmpty()) return;
+
+        boolean hasPending = false;
+        for (BetHistory b : bets) {
+            if ("PENDING".equals(b.getResult())) {
+                hasPending = true;
+                break;
+            }
+        }
+        if (!hasPending) return;
+
+        com.udg.betmasterai.data.remote.SportsApi api = com.udg.betmasterai.data.remote.RetrofitClient.getSportsApi();
+        api.getScores(ApiConstants.DEFAULT_SPORT, ApiConstants.API_KEY, 3).enqueue(new retrofit2.Callback<List<com.udg.betmasterai.data.model.OddsApiScore>>() {
+            @Override
+            public void onResponse(retrofit2.Call<List<com.udg.betmasterai.data.model.OddsApiScore>> call, retrofit2.Response<List<com.udg.betmasterai.data.model.OddsApiScore>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    resolveBets(bets, response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<List<com.udg.betmasterai.data.model.OddsApiScore>> call, Throwable t) {
+            }
+        });
+    }
+
+    private void resolveBets(List<BetHistory> bets, List<com.udg.betmasterai.data.model.OddsApiScore> scores) {
+        new Thread(() -> {
+            for (BetHistory bet : bets) {
+                if (!"PENDING".equals(bet.getResult())) continue;
+
+                for (com.udg.betmasterai.data.model.OddsApiScore score : scores) {
+                    if (score.getId() != null && score.getId().equals(bet.getMatchId()) && score.isCompleted()) {
+                        String winner = getWinner(score);
+                        if (winner == null) continue;
+
+                        String finalResult = bet.getSelectedTeam().equals(winner) ? "WON" : "LOST";
+                        database.betDao().updateBetResult(bet.getId(), finalResult);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    private String getWinner(com.udg.betmasterai.data.model.OddsApiScore score) {
+        if (score.getScores() == null || score.getScores().size() < 2) return null;
+        
+        int homeScore = 0;
+        int awayScore = 0;
+        try {
+            for (com.udg.betmasterai.data.model.OddsApiScore.Score s : score.getScores()) {
+                if (s.getName().equals(score.getHomeTeam())) {
+                    homeScore = Integer.parseInt(s.getScore());
+                } else if (s.getName().equals(score.getAwayTeam())) {
+                    awayScore = Integer.parseInt(s.getScore());
+                }
+            }
+        } catch (NumberFormatException e) {
+            return null;
+        }
+
+        if (homeScore > awayScore) return "Local";
+        if (awayScore > homeScore) return "Visita";
+        return "Empate";
+    }
 
     private String now() {
         return new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());

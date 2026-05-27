@@ -29,7 +29,9 @@ import com.udg.betmasterai.data.local.BetHistory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
         tvStatus           = findViewById(R.id.tvStatus);
         bankrollChart      = findViewById(R.id.bankrollChart);
 
-        findViewById(R.id.btnHistory).setOnClickListener(v -> {
+        android.widget.ImageView btnHistory = findViewById(R.id.btnHistory);
+        btnHistory.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, HistoryActivity.class));
         });
 
@@ -155,10 +158,15 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getAllBets().observe(this, bets -> {
             updateBankrollChart(bets);
             
-            // Calcular el bankroll actual para el adaptador
+            // Calcular el bankroll actual y recopilar partidos apostados para el adaptador
             double currentBankroll = 1000.0;
+            Set<String> bettedMatches = new HashSet<>();
+            
             if (bets != null) {
                 for (BetHistory bet : bets) {
+                    if (bet.getMatchId() != null) {
+                        bettedMatches.add(bet.getMatchId());
+                    }
                     if ("WON".equalsIgnoreCase(bet.getResult())) {
                         currentBankroll += bet.getActualBetAmount() * (bet.getOdds() - 1);
                     } else if ("LOST".equalsIgnoreCase(bet.getResult())) {
@@ -167,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             adapter.setCurrentBankroll(currentBankroll);
+            adapter.setBettedMatches(bettedMatches);
         });
     }
 

@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class MatchData {
     @SerializedName("id")
-    private int id;
+    private String id;
     
     @SerializedName("homeTeam")
     private String homeTeam;
@@ -29,8 +29,8 @@ public class MatchData {
     private double aiProbabilityHome;
 
     // Getters and Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public String getHomeTeam() { return homeTeam; }
     public void setHomeTeam(String homeTeam) { this.homeTeam = homeTeam; }
