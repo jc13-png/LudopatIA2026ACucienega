@@ -14,6 +14,7 @@ public class BetHistory {
     private double actualBetAmount;
     private String result; // "WON", "LOST", "PENDING"
     private long timestamp;
+    private double odds; // Cuota decimal a la que se realizó la apuesta
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -35,4 +36,7 @@ public class BetHistory {
 
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+
+    public double getOdds() { return odds; }
+    public void setOdds(double odds) { this.odds = odds; }
 }
