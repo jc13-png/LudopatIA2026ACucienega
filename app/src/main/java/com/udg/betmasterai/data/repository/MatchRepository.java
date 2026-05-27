@@ -72,7 +72,7 @@ public class MatchRepository {
                     if (matches.isEmpty()) {
                         // La API respondió pero no hay partidos (fuera de temporada, etc.)
                         callback.onError(
-                                "No hay partidos programados para " + sport + " en este momento.",
+                                "Liga sin partidos activos. Prueba otra liga en el selector ↑",
                                 getMockMatches()
                         );
                     } else {

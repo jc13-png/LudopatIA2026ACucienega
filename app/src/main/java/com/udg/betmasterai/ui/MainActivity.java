@@ -62,22 +62,22 @@ public class MainActivity extends AppCompatActivity {
         // ─── Selector de Liga (Spinner) ──────────────────────────────────────
         Spinner spinnerLeague = findViewById(R.id.spinnerLeague);
         String[] leagueNames = {
+                "Champions League (UEFA)",
+                "Ligue 1 (Francia)",
                 "La Liga (España)",
                 "Liga MX (México)",
                 "Premier League (Inglaterra)",
-                "Champions League (UEFA)",
                 "Bundesliga (Alemania)",
-                "Serie A (Italia)",
-                "Ligue 1 (Francia)"
+                "Serie A (Italia)"
         };
         String[] leagueKeys = {
+                "soccer_uefa_champs_league",
+                "soccer_france_ligue_one",
                 "soccer_spain_la_liga",
                 "soccer_mexico_ligamx",
                 "soccer_epl",
-                "soccer_uefa_champs_league",
                 "soccer_germany_bundesliga",
-                "soccer_italy_serie_a",
-                "soccer_france_ligue_one"
+                "soccer_italy_serie_a"
         };
 
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(

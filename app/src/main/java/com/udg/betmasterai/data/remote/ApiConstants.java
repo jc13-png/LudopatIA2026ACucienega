@@ -14,7 +14,7 @@ public class ApiConstants {
     public static final String BASE_URL = "https://api.the-odds-api.com/";
 
     // ⚠️  REEMPLAZA ESTE VALOR CON TU API KEY DE https://the-odds-api.com
-    public static final String API_KEY = "TU_API_KEY_AQUI";
+    public static final String API_KEY = "aa3ce4885ce796a2e316d292ad974f2a";
 
     // Liga por defecto. Otras opciones:
     //   "soccer_epl"                  → Premier League
@@ -24,7 +24,7 @@ public class ApiConstants {
     //   "soccer_france_ligue_one"     → Ligue 1
     //   "soccer_uefa_champs_league"   → Champions League
     //   "soccer_mexico_ligamx"        → Liga MX
-    public static final String DEFAULT_SPORT = "soccer_spain_la_liga";
+    public static final String DEFAULT_SPORT = "soccer_uefa_champs_league";
 
     // Región de casas de apuestas (eu = europeas, las mejores cuotas)
     public static final String REGIONS = "eu";
